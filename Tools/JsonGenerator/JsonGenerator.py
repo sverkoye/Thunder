@@ -815,12 +815,11 @@ def LoadInterface(file):
                 required = []
                 for var in vars:
                     if var.meta.input or not var.meta.output:
-                        if not var.type.IsConst():
-                            if (var.type.IsReference() or var.type.IsPointer()) and not var.type.IsConst():
-                                raise CppParseError(var, "non-const pointer/reference parameters require @in/@out tag")
-                            else:
-                                trace.Warn("non-const parameter assumed to be input (forgot 'const'?)")
+                        if not var.type.IsConst() and not var.meta.input:
+                            trace.Warn("non-const parameter assumed to be input (forgot 'const'?)")
                         var_name = var.name.lower()
+                        if var_name.startswith("__unnamed"):
+                            raise CppParseError(var, "unnamed parameter, can't deduce parameter name")
                         properties[var_name] = ConvertParameter(var)
                         required.append(var_name)
                 params["properties"] = properties
@@ -1162,7 +1161,7 @@ def EmitEnumRegs(root, emit, header_file):
         emit.Line("ENUM_CONVERSION_END(%s);" % fullname)
 
     # Enumeration conversion code
-    emit.Line("#include \"../definitions.h\"")
+    emit.Line("#include <interfaces/definitions.h>")
     emit.Line("#include <core/Enumerate.h>")
     emit.Line("#include \"%s_%s.h\"" % (DATA_NAMESPACE, header_file))
     emit.Line()
@@ -2240,7 +2239,7 @@ def CreateDocument(schema, path):
         MdBr()
 
         def mergedict(d1, d2, prop):
-            return {**(d1[prop] if prop in d1 else dict()), **(d2[prop] if prop in d2 else dict())}
+            return dict((d1[prop] if prop in d1 else dict()).items() + (d2[prop] if prop in d2 else dict()).items())
 
         MdHeader("Introduction")
         MdHeader("Scope", 2)

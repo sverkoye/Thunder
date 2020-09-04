@@ -262,6 +262,7 @@ namespace Core {
         {
             return (IPV6AddressIterator(_index));
         }
+        NodeId Broadcast() const;
         bool IsUp() const;
         bool IsRunning() const;
         uint32_t Up(const bool enabled);
@@ -269,6 +270,8 @@ namespace Core {
         static void Flush();
         uint16_t Count() const;
         string Name() const;
+
+        bool HasMAC() const;
 
         string MACAddress(const char delimiter) const;
         void MACAddress(uint8_t buffer[], const uint8_t length) const;

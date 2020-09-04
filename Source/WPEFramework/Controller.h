@@ -25,7 +25,6 @@
 #include "Probe.h"
 #include "json/JsonData_Controller.h"
 
-
 namespace WPEFramework {
 namespace Plugin {
 
@@ -271,11 +270,11 @@ namespace Plugin {
         Core::ProxyType<Web::Response> PutMethod(Core::TextSegmentIterator& index, const Web::Request& request);
         Core::ProxyType<Web::Response> DeleteMethod(Core::TextSegmentIterator& index, const Web::Request& request);
         void StateChange(PluginHost::IShell* plugin);
-        void DeleteDirectory(const string& directory);
 
         void RegisterAll();
         void UnregisterAll();
         uint32_t endpoint_activate(const JsonData::Controller::ActivateParamsInfo& params);
+        uint32_t endpoint_clone(const JsonData::Controller::CloneParamsInfo& params, Core::JSON::String& response);
         uint32_t endpoint_deactivate(const JsonData::Controller::ActivateParamsInfo& params);
         uint32_t endpoint_startdiscovery(const JsonData::Controller::StartdiscoveryParamsData& params);
         uint32_t endpoint_storeconfig();

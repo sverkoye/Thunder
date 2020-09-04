@@ -17,18 +17,16 @@
  * limitations under the License.
  */
 
-#ifndef _POWER_H
-#define _POWER_H
-
+#pragma once
 #include "Module.h"
 
 namespace WPEFramework {
 namespace Exchange {
 
-    struct IPower : virtual public Core::IUnknown {
+    struct EXTERNAL IPower : virtual public Core::IUnknown {
         enum { ID = ID_POWER };
 
-        enum PCState {
+        enum PCState : uint8_t {
             On = 1, // S0.
             ActiveStandby = 2, // S1.
             PassiveStandby = 3, // S2.
@@ -37,10 +35,8 @@ namespace Exchange {
             PowerOff = 6, // S5.
         };
 
-        struct INotification : virtual public Core::IUnknown {
+        struct EXTERNAL INotification : virtual public Core::IUnknown {
             enum { ID = ID_POWER_NOTIFICATION };
-
-            virtual ~INotification() {}
 
             virtual void StateChange(const PCState) = 0;
         };
@@ -55,4 +51,3 @@ namespace Exchange {
 }
 }
 
-#endif // _POWER_H

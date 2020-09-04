@@ -17,21 +17,28 @@
  * limitations under the License.
  */
 
-#ifndef __MODULE_INTERFACES_PROXYSTUBS_H
-#define __MODULE_INTERFACES_PROXYSTUBS_H
+#pragma once
 
 #ifndef MODULE_NAME
 #define MODULE_NAME Interfaces
 #endif
 
-#include "../core/core.h"
-#include "../com/com.h"
-#include "../plugins/IPlugin.h"
-#include "../plugins/IShell.h"
-#include "../plugins/ISubSystem.h"
+#include <core/core.h>
+
+// These are interfaces offered by Thunder and used in the Plugins. Make them
+// available on interfaces taht are exposed cross plugins.
+#include <plugins/IPlugin.h>
+#include <plugins/ISubSystem.h>
+#include <plugins/IShell.h>
+#include <plugins/IStateControl.h>
+
+// All identifiers to identify an interface are allocated in this same directory
+// in the file calls Ids.h, please extend it with your requried interface number
+// if you are creating a new interface.
 #include "Ids.h"
 
-#undef EXTERNAL
-#define EXTERNAL
+#if defined(PROXYSTUB_BUILDING)
+#include <com/com.h>
+#endif
 
-#endif // __MODULE_INTERFACES_PROXYSTUB_H
+

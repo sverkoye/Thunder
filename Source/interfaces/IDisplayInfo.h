@@ -18,27 +18,22 @@
  */
 
 #pragma once
-
 #include "Module.h"
 
 namespace WPEFramework {
 namespace Exchange {
 
-    struct IGraphicsProperties : virtual public Core::IUnknown {
+    struct EXTERNAL IGraphicsProperties : virtual public Core::IUnknown {
         enum { ID = ID_GRAPHICS_PROPERTIES };
-
-        virtual ~IGraphicsProperties() {}
 
         virtual uint64_t TotalGpuRam() const = 0;
         virtual uint64_t FreeGpuRam() const = 0;
     };
 
-    struct IConnectionProperties : virtual public Core::IUnknown {
+    struct EXTERNAL IConnectionProperties : virtual public Core::IUnknown {
         enum { ID = ID_CONNECTION_PROPERTIES };
 
-        virtual ~IConnectionProperties() { }
-
-        enum HDRType {
+        enum HDRType : uint8_t {
             HDR_OFF,
             HDR_10,
             HDR_10PLUS,
@@ -46,16 +41,14 @@ namespace Exchange {
             HDR_TECHNICOLOR
         };
 
-        enum HDCPProtectionType {
+        enum HDCPProtectionType : uint8_t {
             HDCP_Unencrypted,
             HDCP_1X,
             HDCP_2X
         };
 
-        struct INotification : virtual public Core::IUnknown {
+        struct EXTERNAL INotification : virtual public Core::IUnknown {
             enum { ID = ID_CONNECTION_PROPERTIES_NOTIFICATION };
-
-            virtual ~INotification() {}
 
             virtual void Updated() = 0;
         };
@@ -67,6 +60,7 @@ namespace Exchange {
         virtual bool Connected() const = 0;
         virtual uint32_t Width() const = 0;
         virtual uint32_t Height() const = 0;
+        virtual uint32_t VerticalFreq() const = 0;
         virtual HDRType Type() const = 0;
         virtual HDCPProtectionType HDCPProtection() const = 0;
     };

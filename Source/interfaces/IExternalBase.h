@@ -18,27 +18,14 @@
  */
 
 #pragma once
-
-// ---- Include system wide include files ----
 #include "Module.h"
 #include "IExternal.h"
-
-// ---- Include local include files ----
-
-// ---- Helper types and constants ----
-
-// ---- Helper functions ----
-
-// ---- Referenced classes and types ----
-
-// ---- Class Definition ----
 
 // @stubgen:skip
 
 namespace WPEFramework {
 namespace Exchange {
 
-    template <enum IExternal::identification IDENTIFIER>
     class ExternalBase : public IExternal {
     private:
         class Job { 
@@ -121,15 +108,15 @@ namespace Exchange {
 
     public:
         ExternalBase() = delete;
-        ExternalBase(const ExternalBase<IDENTIFIER>&) = delete;
-        ExternalBase<IDENTIFIER>& operator=(const ExternalBase<IDENTIFIER>&) = delete;
+        ExternalBase(const ExternalBase&) = delete;
+        ExternalBase& operator=(const ExternalBase&) = delete;
 
         #ifdef __WINDOWS__
         #pragma warning(disable : 4355)
         #endif
         ExternalBase(const uint32_t id, const uint32_t type)
             : _adminLock()
-            , _id(IDENTIFIER | (id & 0x0FFFFFFF))
+            , _id(id & 0x00FFFFFF)
             , _type(type)
             , _condition(IExternal::constructing)
             , _clients()
@@ -141,7 +128,7 @@ namespace Exchange {
         #pragma warning(default : 4355)
         #endif
         inline ExternalBase(const uint32_t id, const basic base, const specific spec, const dimension dim, const uint8_t decimals)
-            : ExternalBase(id, ((dim << 19) | ((decimals & 0x07) << 16) | (base << 12) | spec))
+            : ExternalBase(id, IExternal::Type(base, spec, dim, decimals))
         {
         }
         ~ExternalBase() override = default;
@@ -152,19 +139,19 @@ namespace Exchange {
         // ------------------------------------------------------------------------
         inline basic Basic() const
         {
-            return (static_cast<basic>((_type >> 12) & 0xF));
+            return (IExternal::Basic(_type));
         }
         inline dimension Dimension() const
         {
-            return (static_cast<dimension>((_type >> 19) & 0x1FFF));
+            return (IExternal::Dimension(_type));
         }
         inline specific Specific() const
         {
-            return (static_cast<specific>(_type & 0xFFF));
+            return (IExternal::Specific(_type));
         }
         inline uint8_t Decimals() const
         {
-            return ((_type >> 16) & 0x07);
+            return (IExternal::Decimals(_type));
         }
 
         // ------------------------------------------------------------------------
@@ -173,7 +160,7 @@ namespace Exchange {
         // Define the polling time in Seconds. This value has a maximum of a 24 hour.
         inline uint16_t Period() const
         {
-            return (static_cast<Timed&>(_timed).Period());
+            return (static_cast<const Timed&>(_timed).Period());
         }
         inline void Period(const uint16_t value)
         {
@@ -223,6 +210,12 @@ namespace Exchange {
         // Identification of this element.
         uint32_t Identifier() const override
         {
+            return (_id);
+        }
+        uint32_t Module(const uint8_t module) override
+        {
+            ASSERT((module == 0) ^ ((_id & 0xFF000000) == 0));
+            _id = (_id & 0x00FFFFFF) | (module << 24);
             return (_id);
         }
 
@@ -314,6 +307,10 @@ namespace Exchange {
         virtual uint32_t Get(int32_t& value) const = 0;
         virtual uint32_t Set(const int32_t value) = 0;
 
+        BEGIN_INTERFACE_MAP(ExternalBase)
+            INTERFACE_ENTRY(Exchange::IExternal)
+        END_INTERFACE_MAP
+
     protected:
         inline void Updated()
         {
@@ -325,7 +322,7 @@ namespace Exchange {
         }
         inline void ChangeTypeId(const uint32_t id, const uint32_t type)
         {
-            _id = id;
+            _id = (id & 0x00FFFFFF);
             _type = type;
         }
         inline void Lock() const {
@@ -334,10 +331,6 @@ namespace Exchange {
         inline void Unlock() const {
             _adminLock.Unlock();
         }
-
-        BEGIN_INTERFACE_MAP(ExternalBase)
-            INTERFACE_ENTRY(Exchange::IExternal)
-        END_INTERFACE_MAP
 
     private:
         void Notify()

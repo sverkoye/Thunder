@@ -19,6 +19,58 @@
 
 #include "definitions.h"
 
+#ifdef __WINDOWS__
+#include "IAVNClient.h"
+#include "IAVSClient.h"
+#include "IBluetooth.h"
+#include "IBrowser.h"
+#include "ICapture.h"
+#include "ICommand.h"
+#include "IComposition.h"
+#include "IContentDecryption.h"
+#include "IDeviceIdentification.h"
+#include "IDictionary.h"
+#include "IDisplayInfo.h"
+#include "IDolby.h"
+#include "IDRM.h"
+#include "IDsgccClient.h"
+#include "IExternal.h"
+#include "IExternalBase.h"
+#include "IGuide.h"
+#include "IInputPin.h"
+#include "IInputSwitch.h"
+#include "IIPNetwork.h"
+#include "IKeyHandler.h"
+#include "IMath.h"
+#include "IMemory.h"
+#include "IMessenger.h"
+#include "INetflix.h"
+#include "IPackager.h"
+#include "IPerformance.h"
+#include "IPlayerInfo.h"
+#include "IPlayGiga.h"
+#include "IPower.h"
+#include "IProvisioning.h"
+#include "IRemoteControl.h"
+#include "IResourceMonitor.h"
+#include "IRPCLink.h"
+#include "IRtspClient.h"
+#include "ISecureShellServer.h"
+#include "IStream.h"
+#include "ISwitchBoard.h"
+#include "ISystemCommands.h"
+#include "ITestController.h"
+#include "ITestUtility.h"
+#include "ITimeSync.h"
+#include "IVoiceHandler.h"
+#include "IVolumeControl.h"
+#include "IWebDriver.h"
+#include "IWebPA.h"
+#include "IWebServer.h"
+#endif
+
+MODULE_NAME_DECLARATION(BUILD_REFERENCE);
+
 namespace WPEFramework {
 
 struct ScreenResolutionWidthHeight {
@@ -82,6 +134,15 @@ ENUM_CONVERSION_BEGIN(Exchange::IVoiceProducer::IProfile::codec)
     { Exchange::IVoiceProducer::IProfile::codec::PCM, _TXT(_T("pcm")) },
     { Exchange::IVoiceProducer::IProfile::codec::ADPCM, _TXT(_T("adpcm")) },
 ENUM_CONVERSION_END(Exchange::IVoiceProducer::IProfile::codec)
+
+ENUM_CONVERSION_BEGIN(Exchange::IPower::PCState)
+    { Exchange::IPower::On, _TXT(_T("on")) },
+    { Exchange::IPower::ActiveStandby, _TXT(_T("active")) },
+    { Exchange::IPower::PassiveStandby, _TXT(_T("passive")) },
+    { Exchange::IPower::SuspendToRAM, _TXT(_T("suspended")) },
+    { Exchange::IPower::Hibernate, _TXT(_T("hibernate")) },
+    { Exchange::IPower::PowerOff, _TXT(_T("off")) }, 
+ENUM_CONVERSION_END(Exchange::IPower::PCState)
 
 namespace Exchange
 {

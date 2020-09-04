@@ -17,33 +17,7 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "Module.h"
+#include "IUnknown.h"
 
-#include <nexus_config.h>
-#include <bstd.h>
-#include <berr.h>
-#include <bkni.h>
-
-
-namespace Implementation {
-
-class Nexus {
-private:
-    Nexus();
-    ~Nexus();
-
-public:
-    Nexus(const Nexus&) = delete;
-    Nexus& operator=(const Nexus&) = delete;
-
-    static bool Initialized()
-    {
-        static Nexus instance;
-        return (instance._initialized);
-    }
-
-private:
-    bool _initialized;
-}; // class Nexus
-
-} // namespace Implementation
+#include "@PROXYSTUB_COM_SOURCE@"

@@ -17,9 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef __IBROWSER_H
-#define __IBROWSER_H
-
+#pragma once 
 #include "Module.h"
 
 namespace WPEFramework {
@@ -28,13 +26,11 @@ namespace Exchange {
     // This interface gives direct access to a Browser to change
     // Browser specific properties like displayed URL.
 
-    struct IBrowser : virtual public Core::IUnknown {
+    struct EXTERNAL IBrowser : virtual public Core::IUnknown {
         enum { ID = ID_BROWSER };
 
-        struct INotification : virtual public Core::IUnknown {
+        struct EXTERNAL INotification : virtual public Core::IUnknown {
             enum { ID = ID_BROWSER_NOTIFICATION };
-
-            virtual ~INotification() {}
 
             // Signal changes on the subscribed namespace..
             virtual void LoadFinished(const string& URL) = 0;
@@ -42,8 +38,6 @@ namespace Exchange {
             virtual void Hidden(const bool hidden) = 0;
             virtual void Closure() = 0;
         };
-
-        virtual ~IBrowser() {}
 
         virtual void Register(IBrowser::INotification* sink) = 0;
         virtual void Unregister(IBrowser::INotification* sink) = 0;
@@ -58,13 +52,33 @@ namespace Exchange {
     };
 
     /* @json */
-    struct IWebBrowser : virtual public Core::IUnknown {
+    struct EXTERNAL IWebBrowser : virtual public Core::IUnknown {
         enum { ID = ID_WEB_BROWSER };
 
-        /* @event */
-        using INotification = IBrowser::INotification;
+        enum Visibility : uint8_t {
+            HIDDEN = 0,
+            VISIBLE = 1,
+        };
 
-        virtual ~IWebBrowser() { }
+        enum HTTPCookieAcceptPolicyType : uint8_t {
+            ALWAYS = 0,
+            NEVER  = 1,
+            ONLY_FROM_MAIN_DOCUMENT_DOMAIN = 2,
+            EXCLUSIVELY_FROM_MAIN_DOCUMENT_DOMAIN = 3
+        };
+
+        /* @event */
+        struct INotification : virtual public Core::IUnknown {
+            enum { ID = ID_WEBKITBROWSER_NOTIFICATION };
+
+            // Signal changes on the subscribed namespace..
+            virtual void LoadFinished(const string& URL, const int32_t code) = 0;
+            virtual void LoadFailed(const string& URL) = 0;
+            virtual void URLChange(const string& URL, const bool loaded) = 0;
+            virtual void VisibilityChange(const bool hidden) = 0;
+            virtual void PageClosure() = 0;
+            virtual void BridgeQuery(const string& message) = 0;
+        };
 
         virtual void Register(INotification* sink) = 0;
         virtual void Unregister(INotification* sink) = 0;
@@ -85,9 +99,26 @@ namespace Exchange {
         // @brief Current framerate the browser is rendering at
         // @param fps Current FPS
         virtual uint32_t FPS(uint8_t& fps /* @out */) const = 0;
+
+        virtual uint32_t Headers(string& headers /* @out */) const = 0;
+        virtual uint32_t Headers(const string& headers) = 0;
+
+        virtual uint32_t UserAgent(string& ua /* @out */) const = 0;
+        virtual uint32_t UserAgent(const string& ua) = 0;
+
+        virtual uint32_t Languages(string& langs /* @out */) const = 0;
+        virtual uint32_t Languages(const string& langs) = 0;
+
+        virtual uint32_t LocalStorageEnabled(bool& enabled /* @out */) const = 0;
+        virtual uint32_t LocalStorageEnabled(const bool enabled) = 0;
+
+        virtual uint32_t HTTPCookieAcceptPolicy(HTTPCookieAcceptPolicyType& policy /* @out */) const = 0;
+        virtual uint32_t HTTPCookieAcceptPolicy(const HTTPCookieAcceptPolicyType policy) = 0;
+
+        virtual void BridgeReply(const string& payload) = 0;
+        virtual void BridgeEvent(const string& payload) = 0;
+
     };
 
 }
 }
-
-#endif // __IBROWSER_H

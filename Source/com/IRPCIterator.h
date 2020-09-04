@@ -18,11 +18,7 @@
  */
 
 #pragma once
-
-// ---- Include system wide include files ----
-
-// ---- Include local include files ----
-#include "Module.h"
+#include <core/core.h>
 
 namespace WPEFramework {
 
@@ -178,6 +174,9 @@ namespace RPC {
             ASSERT(IsValid());
 
             return (*_iterator);
+        }
+        void Add(const typename INTERFACE::Element& element) {
+            _container.push_back(element);
         }
 
         BEGIN_INTERFACE_MAP(IteratorType<INTERFACE>)

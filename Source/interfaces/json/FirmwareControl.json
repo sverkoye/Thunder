@@ -19,6 +19,7 @@
         "downloadstarted",
         "downloadaborted",
         "downloadcompleted",
+        "installinitiated",
         "installnotstarted",
         "installaborted",
         "installstarted",
@@ -35,10 +36,13 @@
         "generic",
         "invalidparameters",
         "invalidstate",
+        "noenoughspace",
         "operationotsupported",
         "incorrecthash",
+        "unauthenticated",
         "unavailable",
         "timedout",
+        "downloaddirectorynotexist",
         "unkown"
       ],
       "example": "operationotsupported"
@@ -63,11 +67,21 @@
       "params": {
         "$ref": "#/definitions/status"
       }
+    },
+    "downloadsize": {
+      "readonly": true,
+      "summary": "Max free space available to download image",
+      "params": {
+        "description": "available free space in bytes",
+        "type": "number",
+        "size": 64,
+        "example": 315576
+      }
     }
   },
   "methods": {
     "upgrade": {
-      "summary": "Upgrade the device to the given firmware",
+      "summary": "Upgrade the device to the given firmware. (Note: Ensure size of firmware image should be < 500MB)",
       "events": "upgradeprogress",
       "params": {
         "type": "object",
@@ -86,7 +100,7 @@
             "$ref": "#/definitions/type"
           },
           "progressinterval": {
-            "description": "number of seconds between progress update events (5 secoonds, 10 seconds etc). 0 means invoking callback only once to report final upgrade result",
+            "description": "number of seconds between progress update events (5 seconds, 10 seconds etc). 0 means invoking callback only once to report final upgrade result",
             "type": "number",
             "size": 16,
             "example": "10"
@@ -132,6 +146,10 @@
         {
           "description": "Incorrect hash given",
           "$ref": "#/common/errors/incorrecthash"
+        },
+        {
+          "description": "Authentication failure",
+          "$ref": "#/common/errors/unauthenticated"
         }
       ]
     }
@@ -149,17 +167,17 @@
           "error": {
             "$ref": "#/definitions/error"
           },
-          "percentage": {
+          "progress": {
             "type": "number",
-            "descrption": "Percentage of upgrade",
-            "size": 16,
+            "description": "Progress of upgrade (number of bytes transferred during download or percentage of completion during install",
+            "size": 32,
             "example": 89
           }
         },
         "required": [
           "status",
           "error",
-          "percentage"
+          "progress"
         ]
       }
     }

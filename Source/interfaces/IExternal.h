@@ -18,62 +18,33 @@
  */
 
 #pragma once
-
-// ---- Include system wide include files ----
 #include "Module.h"
-
-// ---- Include local include files ----
-
-// ---- Helper types and constants ----
-
-// ---- Helper functions ----
-
-// ---- Referenced classes and types ----
-
-// ---- Class Definition ----
 
 namespace WPEFramework {
 namespace Exchange {
-    struct IExternal : virtual public Core::IUnknown {
-        virtual ~IExternal() {}
-
+    struct EXTERNAL IExternal : virtual public Core::IUnknown {
         enum { ID = ID_EXTERNAL };
 
-        struct INotification : virtual public Core::IUnknown {
-
-            virtual ~INotification() {}
-
+        struct EXTERNAL INotification : virtual public Core::IUnknown {
             enum { ID = ID_EXTERNAL_NOTIFICATION };
 
             // Push changes. If the Current value changes, the next method is called.
             virtual void Update(const uint32_t id) = 0;
         };
 
-        struct ICatalog : virtual public Core::IUnknown {
-            ~ICatalog() override = default;
-
+        struct EXTERNAL ICatalog : virtual public Core::IUnknown {
             enum { ID = ID_EXTERNAL_CATALOG };
 
-            struct INotification : virtual public Core::IUnknown {
-
-                ~INotification() override = default;
-
+            struct EXTERNAL INotification : virtual public Core::IUnknown {
                 enum { ID = ID_EXTERNAL_CATALOG_NOTIFICATION };
 
-                virtual void Update(IExternal* source) = 0;
+                virtual void Activated(IExternal* source) = 0;
+                virtual void Deactivated(IExternal* source) = 0;
             };
 
             // Pushing notifications to interested sinks
             virtual void Register(ICatalog::INotification* sink) = 0;
             virtual void Unregister(ICatalog::INotification* sink) = 0;
-        };
-
-        enum identification {
-            ZWAVE    = 0x10000000,
-            GPIO     = 0x20000000,
-            I2C      = 0x30000000,
-            ZIGBEE   = 0x40000000,
-            NRF24L01 = 0x50000000
         };
 
         //  Basic/specific and dimension together define the Type.
@@ -85,12 +56,12 @@ namespace Exchange {
         //        should be considerd to be the remainder.
         //        3 bits (0..7)
         //
-        enum basic { /* 4 bits (16)*/
+        enum basic : uint8_t { /* 4 bits (16)*/
             regulator = 0x0,
             measurement = 0x1
         };
 
-        enum specific { /* 12 bits (4096) */
+        enum specific : uint16_t { /* 12 bits (4096) */
             general = 0x000,
             electricity = 0x001,
             water = 0x002,
@@ -108,7 +79,7 @@ namespace Exchange {
             clock = 0x00E
         };
 
-        enum dimension { /* 13 bits (8192) */
+        enum dimension : uint16_t { /* 13 bits (8192) */
             logic = 0x0000, /* values 0 or 1  */
             percentage = 0x0001, /* values 0 - 100 */
             kwh = 0x0002, /* kilo Watt hours  */
@@ -118,10 +89,10 @@ namespace Exchange {
             units = 0x0006, /* unqualified value, just units */
         };
 
-        enum condition {
-            constructing = 0x0000,
-            activated = 0x0001,
-            deactivated = 0x0002
+        enum condition : uint8_t {
+            constructing = 0x00,
+            activated    = 0x01,
+            deactivated  = 0x02
         };
 
         // Pushing notifications to interested sinks
@@ -133,6 +104,12 @@ namespace Exchange {
 
         // Identification of this element.
         virtual uint32_t Identifier() const = 0;
+
+        // The module is the top 8 bits of the Identifier. The value of 0 is reserved,
+        // it means that the module is not assigned. Any other number indicates that the 
+        // IExternal is allocated to a module and should not be overwritten with an other
+        // number than 0.
+        virtual uint32_t Module(const uint8_t module) = 0;
 
         // Characteristics of this element
         virtual uint32_t Type() const = 0;
@@ -146,6 +123,29 @@ namespace Exchange {
 
         // Periodically we might like to be evaluated, call this method at a set time.
         virtual void Evaluate() = 0;
+
+        // ------------------------------------------------------------------------
+        // Convenience methods to extract interesting information from the Type()
+        // ------------------------------------------------------------------------
+        static basic Basic(const uint32_t instanceType)
+        {
+            return (static_cast<basic>((instanceType >> 12) & 0xF));
+        }
+        static dimension Dimension(const uint32_t instanceType)
+        {
+            return (static_cast<dimension>((instanceType >> 19) & 0x1FFF));
+        }
+        static specific Specific(const uint32_t instanceType)
+        {
+            return (static_cast<specific>(instanceType & 0xFFF));
+        }
+        static uint8_t Decimals(const uint32_t instanceType)
+        {
+            return ((instanceType >> 16) & 0x07);
+        }
+        static uint32_t Type(const basic base, const specific spec, const dimension dim, const uint8_t decimals) {
+            return ((dim << 19) | ((decimals & 0x07) << 16) | (base << 12) | spec);
+        }
     };
 
 } } // Namespace Exchange

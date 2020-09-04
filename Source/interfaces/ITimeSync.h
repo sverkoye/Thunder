@@ -17,33 +17,27 @@
  * limitations under the License.
  */
 
-#ifndef __INTERFACE_TIMESYNC_H
-#define __INTERFACE_TIMESYNC_H
+#pragma once
+#include "Module.h"
 
 // @stubgen:skip
-
-#include "Module.h"
 
 namespace WPEFramework {
 namespace Exchange {
 
     // This interface gives direct access to a time synchronize / update
-    struct ITimeSync : virtual public Core::IUnknown {
+    struct EXTERNAL ITimeSync : virtual public Core::IUnknown {
         enum { ID = ID_TIMESYNC };
 
-        struct INotification : virtual public Core::IUnknown {
+        struct EXTERNAL INotification : virtual public Core::IUnknown {
             enum { ID = ID_TIMESYNC_NOTIFICATION };
-
-            virtual ~INotification() {}
 
             // Some change happened with respect to the Network..
             virtual void Completed() = 0;
         };
 
-        virtual ~ITimeSync() {}
-
-        virtual void Register(ITimeSync::INotification* notification) = 0;
-        virtual void Unregister(ITimeSync::INotification* notification) = 0;
+        virtual void Register(INotification* notification) = 0;
+        virtual void Unregister(INotification* notification) = 0;
 
         virtual uint32_t Synchronize() = 0;
         virtual void Cancel() = 0;
@@ -53,5 +47,3 @@ namespace Exchange {
 
 } // namespace Exchange
 } // namespace WPEFramework
-
-#endif // __INTERFACE_TIMESYNC_H

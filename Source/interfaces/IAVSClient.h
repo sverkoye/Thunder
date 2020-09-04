@@ -16,24 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
 
+#pragma once
 #include "Module.h"
 
 namespace WPEFramework {
 namespace Exchange {
 
     //@json
-    struct IAVSController : virtual public Core::IUnknown {
+    struct EXTERNAL IAVSController : virtual public Core::IUnknown {
         enum { ID = ID_AVSCONTROLLER };
-        virtual ~IAVSController(){}
 
         //@event
-        struct INotification : virtual public Core::IUnknown {
+        struct EXTERNAL INotification : virtual public Core::IUnknown {
             enum { ID = ID_AVSCONTROLLER_NOTIFICATION };
-            virtual ~INotification(){}
 
-            enum dialoguestate {
+            enum dialoguestate : uint8_t {
                 IDLE,
                 LISTENING,
                 EXPECTING,
@@ -60,14 +58,10 @@ namespace Exchange {
         virtual uint32_t Record(const bool start) = 0;
     };
 
-    struct IAVSClient : virtual public Core::IUnknown {
+    struct EXTERNAL IAVSClient : virtual public Core::IUnknown {
         enum { ID = ID_AVSCLIENT };
 
-        virtual ~IAVSClient(){};
-
-        virtual bool Initialize(PluginHost::IShell* service, const std::string& alexaClientConfig,
-            const std::string& smartScreenConfig, const std::string& pathToInputFolder, const std::string& audioSource,
-            const bool enableKWD, const std::string& logLevel) = 0;
+        virtual bool Initialize(PluginHost::IShell* service, const string& configuration) = 0;
         virtual bool Deinitialize() = 0;
         virtual IAVSController* Controller() = 0;
         virtual void StateChange(PluginHost::IShell* audioSource) = 0;
